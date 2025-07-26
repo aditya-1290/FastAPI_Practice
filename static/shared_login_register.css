@@ -12,7 +12,8 @@ body {
 
 /* Container Styles */
 .container, .auth-container {
-    max-width: 450px;
+    max-height: 790px;
+    max-width: 650px;
     margin: 2rem auto;
     padding: 2rem;
     background: white;
@@ -95,7 +96,7 @@ body {
 }
 
 .password-input input {
-    width: 100%;
+    width: 92%;
     padding-right: 2.5rem;
 }
 

@@ -201,6 +201,80 @@ async def get_dashboard(request: Request, current_user: models.User = Depends(ge
     else:
         return RedirectResponse(url="/login")
 
+@router.get("/dashboard/my_tickets", response_class=HTMLResponse)
+async def get_my_tickets(request: Request, current_user: models.User = Depends(get_current_user_from_cookie), db: Session = Depends(get_db)):
+    if current_user.role != models.UserRole.customer:
+        return RedirectResponse(url="/login")
+    tickets = db.query(models.Ticket).filter(models.Ticket.user_id == current_user.id).order_by(models.Ticket.created_at.desc()).all()
+    return templates.TemplateResponse(
+        "customer_my_tickets.html",
+        {
+            "request": request,
+            "user": current_user,
+            "tickets": tickets
+        }
+    )
+
+@router.get("/dashboard/knowledge_base", response_class=HTMLResponse)
+async def get_knowledge_base(request: Request, current_user: models.User = Depends(get_current_user_from_cookie), db: Session = Depends(get_db)):
+    if current_user.role != models.UserRole.customer:
+        return RedirectResponse(url="/login")
+    # For now, mock knowledge base articles
+    articles = [
+        {"id": 1, "title": "How to reset your password", "summary": "Steps to reset your password."},
+        {"id": 2, "title": "How to create a support ticket", "summary": "Guide to create a support ticket."},
+        {"id": 3, "title": "Contact support", "summary": "How to contact support team."}
+    ]
+    return templates.TemplateResponse(
+        "customer_knowledge_base.html",
+        {
+            "request": request,
+            "user": current_user,
+            "articles": articles
+        }
+    )
+
+@router.get("/dashboard/settings", response_class=HTMLResponse)
+async def get_settings(request: Request, current_user: models.User = Depends(get_current_user_from_cookie)):
+    if current_user.role != models.UserRole.customer:
+        return RedirectResponse(url="/login")
+    return templates.TemplateResponse(
+        "customer_settings.html",
+        {
+            "request": request,
+            "user": current_user
+        }
+    )
+
+@router.post("/dashboard/settings", response_class=HTMLResponse)
+async def post_settings(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    current_user: models.User = Depends(get_current_user_from_cookie),
+    db: Session = Depends(get_db)
+):
+    if current_user.role != models.UserRole.customer:
+        return RedirectResponse(url="/login")
+    # Update user info
+    current_user.name = name
+    current_user.email = email
+    try:
+        db.add(current_user)
+        db.commit()
+        message = "Settings updated successfully."
+    except Exception as e:
+        db.rollback()
+        message = "Failed to update settings."
+    return templates.TemplateResponse(
+        "customer_settings.html",
+        {
+            "request": request,
+            "user": current_user,
+            "message": message
+        }
+    )
+
 @router.get("/logout")
 async def logout(response: RedirectResponse):
     redirect_response = RedirectResponse(
