@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, validators, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -48,7 +48,7 @@ class AttachmentBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=50)
 
-    @validators('password')
+    @field_validator('password')
     def password_complexity(cls, v):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
@@ -74,7 +74,7 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
     is_verified: Optional[bool] = None
 
-    @model_validator
+    @model_validator(mode='before')
     def check_at_least_one_field(cls, values):
         if not any(values.values()):
             raise ValueError("At least one field must be provided for update")
@@ -88,7 +88,7 @@ class TicketUpdate(BaseModel):
     category: Optional[str] = Field(None, max_length=50)
     due_date: Optional[datetime] = None
 
-    @model_validator
+    @model_validator(mode='before')
     def check_at_least_one_field(cls, values):
         if not any(values.values()):
             raise ValueError("At least one field must be provided for update")
@@ -98,7 +98,7 @@ class TicketResponseUpdate(BaseModel):
     message: Optional[str] = Field(None, min_length=10)
     is_internal: Optional[bool] = None
 
-    @model_validator
+    @model_validator(mode='before')
     def check_at_least_one_field(cls, values):
         if not any(values.values()):
             raise ValueError("At least one field must be provided for update")
@@ -113,21 +113,21 @@ class UserResponse(UserBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        form_attributes = True
 
 class TicketAttachmentResponse(AttachmentBase):
     id: int
     uploaded_at: datetime
 
     class Config:
-        orm_mode = True
+        form_attributes = True
 
 class ResponseAttachmentResponse(AttachmentBase):
     id: int
     uploaded_at: datetime
 
     class Config:
-        orm_mode = True
+        form_attributes = True
 
 class TicketResponseResponse(TicketResponseBase):
     id: int
@@ -137,7 +137,7 @@ class TicketResponseResponse(TicketResponseBase):
     attachments: List[ResponseAttachmentResponse] = []
 
     class Config:
-        orm_mode = True
+        form_attributes = True
 
 class TicketResponse(TicketBase):
     id: int
@@ -150,13 +150,13 @@ class TicketResponse(TicketBase):
     attachments: List[TicketAttachmentResponse] = []
 
     class Config:
-        orm_mode = True
+        form_attributes = True
 
 class UserWithTicketsResponse(UserResponse):
     tickets: List[TicketResponse] = []
 
     class Config:
-        orm_mode = True
+        form_attributes = True
 
 # Authentication schemas
 class Token(BaseModel):

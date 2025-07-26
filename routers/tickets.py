@@ -4,13 +4,13 @@ from typing import List, Optional, Annotated
 from datetime import datetime
 import schemas, models
 from database import get_db
-from security import get_current_user
+from routers.auth import get_current_user
 from fastapi import Query  
 from pydantic import Field
 
 router = APIRouter()
 
-@router.post("/create_ticket", response_model=schemas.TicketResponseOut)
+@router.post("/create_ticket", response_model=schemas.TicketResponse)
 async def create_ticket(
     ticket: schemas.TicketCreate,
     current_user: models.User = Depends(get_current_user),
@@ -48,7 +48,7 @@ async def create_ticket(
             detail="Failed to create ticket"
         )
 
-@router.get("/get_tickets", response_model=List[schemas.TicketResponseOut])
+@router.get("/get_tickets", response_model=List[schemas.TicketResponseResponse])
 async def get_tickets(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -84,7 +84,7 @@ async def get_tickets(
     
     return tickets
 
-@router.get("get_ticket_id/{ticket_id}", response_model=schemas.TicketResponseOut)
+@router.get("get_ticket_id/{ticket_id}", response_model=schemas.TicketResponseResponse)
 async def get_ticket(
     ticket_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -155,7 +155,7 @@ async def add_ticket_response(
             detail="Failed to add response"
         )
 
-@router.patch("update_ticket_status/{ticket_id}", response_model=schemas.TicketResponseOut)
+@router.patch("update_ticket_status/{ticket_id}", response_model=schemas.TicketResponse)
 async def update_ticket_status(
     ticket_id: int,
     ticket_update: schemas.TicketUpdate,

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models, schemas
 from security import (
-    get_password_hash,
+    get_password,
     verify_password,
     create_access_token,
     create_refresh_token,
@@ -106,7 +106,7 @@ async def post_register(
         )
     
     # Create new user
-    hashed_password = get_password_hash(password)
+    hashed_password = get_password(password)
     new_user = models.User(
         name=name,
         email=email,

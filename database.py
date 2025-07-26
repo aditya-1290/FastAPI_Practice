@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Enhanced database configuration wit connection pooling and timeouts
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:redhay@db:3306/pracitce_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:redhat@localhost:3306/practice_db")
 
 engine = create_engine(
     DATABASE_URL,
