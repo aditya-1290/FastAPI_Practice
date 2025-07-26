@@ -10,7 +10,7 @@ import logging
 #Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
+        
 app = FastAPI(
     title="Customer Support and Feedback System",
     description="API for managing customer support tickets",
@@ -40,7 +40,7 @@ if os.getenv("APP_ENV","development")== "development":
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Setup Templates
-templates_dir = os.path.join(os.pathdirname(os.path.abspath(__file__), "templates"))
+templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 templates = Jinja2Templates(directory=templates_dir)
 
 # Include Routers
@@ -53,3 +53,4 @@ app.include_router(tickets.router, prefix="/api/tickets", tags=["Tickets"])
 async def health_check():
     return {"status": "healthy"}
 
+       

@@ -1,0 +1,85 @@
+{% extends "customer/base.html" %}
+
+{% block title %}My Tickets{% endblock %}
+
+{% block content %}
+<section class="my-tickets">
+    <h1>My Tickets</h1>
+    
+    <div class="ticket-filters">
+        <form method="get" action="/my-tickets">
+            <div class="filter-group">
+                <label for="status">Status:</label>
+                <select name="status" id="status" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open</option>
+                    <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="priority">Priority:</label>
+                <select name="priority" id="priority" onchange="this.form.submit()">
+                    <option value="">All Priorities</option>
+                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    
+    <table class="ticket-table">
+        <thead>
+            <tr>
+                <th>Ticket ID</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>#{{ ticket.id }}</td>
+                <td>{{ ticket.subject }}</td>
+                <td>
+                    <span class="status-badge {{ ticket.status }}">
+                        {{ ticket.status | replace('_', ' ') | title }}
+                    </span>
+                </td>
+                <td>
+                    <span class="priority-badge {{ ticket.priority }}">
+                        {{ ticket.priority | title }}
+                    </span>
+                </td>
+                <td>{{ ticket.created_at.strftime('%Y-%m-%d') }}</td>
+                <td><a href="{{ url_for('frontend.view_ticket', ticket_id=ticket.id) }}" class="btn-view">View</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">No tickets found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="pagination">
+        <span>Page {{ current_page }} of {{ total_pages }}</span>
+        <div class="pagination-buttons">
+            {% if current_page > 1 %}
+            <a href="{{ url_for('frontend.get_my_tickets', page=current_page-1, status=status_filter, priority=priority_filter) }}" 
+               class="btn-prev">Previous</a>
+            {% endif %}
+            
+            {% if current_page < total_pages %}
+            <a href="{{ url_for('frontend.get_my_tickets', page=current_page+1, status=status_filter, priority=priority_filter) }}" 
+               class="btn-next">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

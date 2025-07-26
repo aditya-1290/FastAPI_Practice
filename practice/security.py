@@ -15,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
 pwd_context = CryptContext(
-    schemas=["bcrypt"],
+    schemes=["bcrypt"],
     deprecated="auto",
     bcrypt__rounds=12 # increased rounds for better security
 )
