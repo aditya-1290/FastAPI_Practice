@@ -80,7 +80,7 @@
                     <div class="section-header">
                         <h3><i class="fas fa-plus-circle"></i> Create New Ticket</h3>
                     </div>
-                    <form id="ticketForm" class="ticket-form">
+                    <form id="ticketForm" class="ticket-form" method="post" action="dashboard/create_ticket" enctype="multipart/form-data">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="subject"><i class="fas fa-heading"></i> Subject</label>
@@ -105,7 +105,7 @@
                             <div class="form-group">
                                 <label for="priority"><i class="fas fa-exclamation-circle"></i> Priority</label>
                                 <select id="priority" name="priority">
-                                    <option value="low">Low</option>
+                                    <option value="low">Low</option>                                                                                                                                  
                                     <option value="medium" selected>Medium</option>
                                     <option value="high">High</option>
                                 </select>

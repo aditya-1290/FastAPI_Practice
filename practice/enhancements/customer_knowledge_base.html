@@ -1,0 +1,37 @@
+{% extends "customer/base.html" %}
+
+{% block title %}Knowledge Base{% endblock %}
+
+{% block content %}
+<section class="knowledge-base">
+    <h1>Knowledge Base</h1>
+    
+    <form method="get" action="/dashboard/knowledge-base" class="search-box">
+        <input type="text" name="search" placeholder="Search articles..." value="{{ search_query or '' }}">
+        <button type="submit">Search</button>
+    </form>
+    
+    <div class="knowledge-base-content">
+        <div class="categories">
+            <h2>Categories</h2>
+            <!-- {% if not categories %} -->
+            <ul>
+                {% for category in categories %}
+                <li><a href="#">{{ category }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="popular-articles">
+            <h2>Popular Articles</h2>
+            {% for article in popular_articles %}
+            <div class="article-card">
+                <h3>{{ article.title }}</h3>
+                <p>{{ article.content }}</p>
+                <a href="#" class="read-more">Read More</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

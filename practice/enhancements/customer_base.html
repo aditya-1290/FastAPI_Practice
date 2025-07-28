@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Customer Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/customer.css') }}">
+</head>
+<body>
+    <div class="customer-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <div class="avatar">{{ user.name[0] }}</div>
+                <div class="user-info">
+                    <span class="name">{{ user.name }}</span>
+                    <span class="email">{{ user.email }}</span>
+                </div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('frontend.get_dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('frontend.get_my_tickets') }}">My Tickets</a></li>
+                    <li><a href="{{ url_for('frontend.get_knowledge_base') }}">Knowledge Base</a></li>
+                    <li><a href="{{ url_for('frontend.get_settings') }}">Settings</a></li>
+                    <li><a href="{{ url_for('frontend.logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/customer.js') }}"></script>
+</body>
+</html>

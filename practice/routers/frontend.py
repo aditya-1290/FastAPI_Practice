@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Request, Form, Depends, status, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates

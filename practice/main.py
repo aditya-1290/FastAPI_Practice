@@ -45,12 +45,12 @@ templates = Jinja2Templates(directory=templates_dir)
 
 # Include Routers
 app.include_router(frontend.router)
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(tickets.router, prefix="/api/tickets", tags=["Tickets"])
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(tickets.router, prefix="/dashboard", tags=["Tickets"])
 
 # Health check endpoint
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
-
        
+            
