@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create Account | Support System</title>
+    <link rel="stylesheet" href="/static/shared_login_register.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">
+                <i class="fas fa-headset"></i>
+                <h1>Support Portal</h1>
+            </div>
+            <h2>Create Your Account</h2>
+            <p class="subtitle">Join our support community today</p>
+        </div>
+
+        <form id="registerForm" method="post" action="/register" class="auth-form">
+            {% if error %}
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="name">
+                    <i class="fas fa-user"></i> Full Name
+                </label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name" />
+            </div>
+
+            <div class="form-group">
+                <label for="email">
+                    <i class="fas fa-envelope"></i> Email Address
+                </label>
+                <input type="email" id="email" name="email" required placeholder="your@email.com" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <div class="password-input">
+                    <input type="password" id="password" name="password" required placeholder="Create a password" />
+                    <span class="toggle-password" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-meter"></div>
+                    <span class="strength-text">Password strength</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="role">
+                    <i class="fas fa-user-tag"></i> Account Type
+                </label>
+                <select id="role" name="role" required>
+                    <option value="" disabled selected>Select your role</option>
+                    <option value="customer">Customer</option>
+                    <option value="support_agent">Support Agent</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="/login" class="login-link">Sign in here</a></p>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthMeter = document.querySelector('.strength-meter');
+            const strengthText = document.querySelector('.strength-text');
+            
+            // Reset
+            strengthMeter.style.width = '0%';
+            strengthMeter.style.backgroundColor = '#ddd';
+            
+            if (password.length > 0) {
+                // Very simple strength calculation
+                let strength = 0;
+                if (password.length >= 8) strength += 25;
+                if (/[A-Z]/.test(password)) strength += 25;
+                if (/[0-9]/.test(password)) strength += 25;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+                
+                strengthMeter.style.width = strength + '%';
+                
+                // Color coding
+                if (strength < 50) {
+                    strengthMeter.style.backgroundColor = '#ff4d4d';
+                    strengthText.textContent = 'Weak';
+                } else if (strength < 75) {
+                    strengthMeter.style.backgroundColor = '#ffa500';
+                    strengthText.textContent = 'Moderate';
+                } else {
+                    strengthMeter.style.backgroundColor = '#4CAF50';
+                    strengthText.textContent = 'Strong';
+                }
+            } else {
+                strengthText.textContent = 'Password strength';
+            }
+        });
+    </script>
+</body>
+</html>

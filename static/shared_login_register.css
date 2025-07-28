@@ -1,0 +1,234 @@
+/* Shared Auth Styles - auth.css */
+
+/* Base Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Container Styles */
+.container, .auth-container {
+    max-height: 790px;
+    max-width: 650px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styles */
+.header, .auth-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.header h1, .auth-header h1 {
+    color: #2c3e50;
+    margin: 0.5rem 0;
+    font-size: 1.8rem;
+}
+
+.auth-header h2 {
+    margin: 1rem 0 0.5rem;
+    color: #2c3e50;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.logo i {
+    font-size: 1.8rem;
+    color: #3498db;
+}
+
+/* Form Styles */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group input, .form-group select {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Password Input Styles */
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    width: 92%;
+    padding-right: 2.5rem;
+}
+
+.toggle-password, .password-toggle {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.password-toggle {
+    position: relative;
+    display: inline-block;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    color: #3498db;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-meter {
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    margin-bottom: 0.3rem;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+.password-hints {
+    margin: 0.5rem 0 0 1rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+.password-hints li {
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.password-hints i {
+    font-size: 0.4rem;
+}
+
+/* Button Styles */
+.btn {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-error {
+    background-color: #fdecea;
+    color: #d32f2f;
+    border: 1px solid #f5c2c7;
+}
+
+.alert-success {
+    background-color: #edf7ed;
+    color: #2e7d32;
+    border: 1px solid #c3e6cb;
+}
+
+/* Footer Styles */
+.form-footer, .auth-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.form-footer a, .auth-footer a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.form-footer a:hover, .auth-footer a:hover {
+    text-decoration: underline;
+}
+
+.form-footer p {
+    margin: 0.5rem 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .container, .auth-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+}

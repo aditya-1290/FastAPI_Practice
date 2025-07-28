@@ -1,0 +1,59 @@
+{% extends "customer/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<section class="settings">
+    <h1>Account Settings</h1>
+    
+    {% if request.query_params.get('message') %}
+    <div class="alert alert-success">
+        {{ request.query_params.get('message') }}
+    </div>
+    {% endif %}
+    
+    {% if request.query_params.get('error') %}
+    <div class="alert alert-error">
+        {{ request.query_params.get('error') }}
+    </div>
+    {% endif %}
+    
+    <form method="post" action="dashboard/settings/update" class="settings-form">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" value="{{ user.name }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}">
+        </div>
+        
+        <div class="form-group">
+            <label>Notification Preferences</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="notifications" checked> Email notifications</label>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Save Changes</button>
+            <a href="/dashboard" class="btn-cancel">Cancel</a>
+        </div>
+    </form>
+    
+    <div class="account-actions">
+        <h2>Account Actions</h2>
+        <a href="/change_password" class="btn-change-password">Change Password</a>
+        <button class="btn-delete-account" onclick="confirmDelete()">Delete Account</button>
+    </div>
+</section>
+
+<script>
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        window.location.href = '/delete_account';
+    }
+}
+</script>
+{% endblock %}
