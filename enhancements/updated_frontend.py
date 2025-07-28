@@ -1,6 +1,6 @@
 # Add these new routes to your existing frontend.py
 
-@router.get("/my-tickets", response_class=HTMLResponse)
+@router.get("/dashboard/my_tickets", response_class=HTMLResponse)
 async def get_my_tickets(
     request: Request,
     current_user: models.User = Depends(get_current_user_from_cookie),
@@ -30,7 +30,7 @@ async def get_my_tickets(
                   .all()
     
     return templates.TemplateResponse(
-        "customer/my_tickets.html",
+        "customer/customer_my_tickets.html",
         {
             "request": request,
             "user": current_user,

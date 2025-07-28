@@ -19,7 +19,21 @@ router = APIRouter()
 security_scheme = HTTPBearer()
  
 async def get_current_user(request: Request, db: Session = Depends(get_db), credentials: HTTPAuthorizationCredentials = Depends(security_scheme)) -> models.User:
-    token = credentials.credentials
+    token = None
+    # Try to get token from Authorization header
+    if credentials:
+        token = credentials.credentials
+    # If no token in header, try to get from cookie
+    if not token:
+        cookie_token = request.cookies.get("access_token")
+        if cookie_token and cookie_token.startswith("Bearer "):
+            token = cookie_token[len("Bearer "):]
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     payload = decode_token(token)
     if not payload or payload.get("type") != "access":
         raise HTTPException(

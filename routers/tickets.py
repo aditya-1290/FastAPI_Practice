@@ -84,7 +84,7 @@ async def get_tickets(
     
     return tickets
 
-@router.get("get_ticket_id/{ticket_id}", response_model=schemas.TicketResponseResponse)
+@router.get("/get_ticket_id/{ticket_id}", response_model=schemas.TicketResponseResponse)
 async def get_ticket(
     ticket_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -109,7 +109,7 @@ async def get_ticket(
     
     return ticket
 
-@router.post("add_ticket_response/{ticket_id}/responses", response_model=schemas.TicketResponseResponse)
+@router.post("/add_ticket_response/{ticket_id}/responses", response_model=schemas.TicketResponseResponse)
 async def add_ticket_response(
     ticket_id: int,
     response: schemas.TicketResponseCreate,
@@ -155,7 +155,7 @@ async def add_ticket_response(
             detail="Failed to add response"
         )
 
-@router.patch("update_ticket_status/{ticket_id}", response_model=schemas.TicketResponse)
+@router.patch("/update_ticket_status/{ticket_id}", response_model=schemas.TicketResponse)
 async def update_ticket_status(
     ticket_id: int,
     ticket_update: schemas.TicketUpdate,

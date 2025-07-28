@@ -1,0 +1,54 @@
+{% extends "customer/base.html" %}
+
+{% block title %}Ticket #{{ ticket.id }} - {{ ticket.subject }}{% endblock %}
+
+{% block content %}
+<section class="ticket-detail">
+    <div class="ticket-header">
+        <h1>Ticket #{{ ticket.id }}: {{ ticket.subject }}</h1>
+        <div class="ticket-meta">
+            <span class="status-badge {{ ticket.status }}">
+                {{ ticket.status | replace('_', ' ') | title }}
+            </span>
+            <span class="priority-badge {{ ticket.priority }}">
+                {{ ticket.priority | title }}
+            </span>
+            <span class="created-at">Created: {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+    </div>
+    
+    {% if request.query_params.get('error') %}
+    <div class="alert alert-error">
+        {{ request.query_params.get('error') }}
+    </div>
+    {% endif %}
+    
+    <div class="ticket-conversation">
+        {% for response in responses %}
+        <div class="response {% if response.responder_id == current_user.id %}my-response{% endif %}">
+            <div class="response-header">
+                <span class="responder">
+                    {% if response.responder_id == ticket.user_id %}
+                    You
+                    {% else %}
+                    Support Agent
+                    {% endif %}
+                </span>
+                <span class="response-date">{{ response.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            </div>
+            <div class="response-content">
+                {{ response.message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <form method="post" action="{{ url_for('frontend.add_ticket_response_view', ticket_id=ticket.id) }}" class="response-form">
+        <div class="form-group">
+            <label for="message">Add Response</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Submit Response</button>
+    </form>
+</section>
+{% endblock %}
