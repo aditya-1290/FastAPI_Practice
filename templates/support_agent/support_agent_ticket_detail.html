@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ticket Detail | Support Agent</title>
+    <link rel="stylesheet" href="/static/shared_dashboard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .ticket-detail-container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ticket-info {
+            margin-top: 10px;
+        }
+        .ticket-info p {
+            margin: 5px 0;
+        }
+        .responses {
+            margin-top: 30px;
+        }
+        .response {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .response:last-child {
+            border-bottom: none;
+        }
+        .response-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .response-message {
+            white-space: pre-wrap;
+        }
+        .add-response-form {
+            margin-top: 30px;
+        }
+        .add-response-form textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+        .add-response-form button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .status-update {
+            margin-top: 20px;
+        }
+        .status-update label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .status-update select {
+            padding: 5px 10px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket-detail-container">
+        <h1>Ticket Detail</h1>
+        <div class="ticket-header">
+            <h2>{{ ticket.subject }}</h2>
+            <div class="status-update">
+                <label for="statusSelect">Status:</label>
+                <select id="statusSelect" name="status">
+                    <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
+                    <option value="in_progress" {% if ticket.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="on_hold" {% if ticket.status == 'on_hold' %}selected{% endif %}>On Hold</option>
+                    <option value="closed" {% if ticket.status == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+                <button id="updateStatusBtn">Update Status</button>
+            </div>
+        </div>
+        <div class="ticket-info">
+            <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+            <p><strong>Created At:</strong> {{ ticket.created_at }}</p>
+            <p><strong>Description:</strong></p>
+            <p>{{ ticket.description }}</p>
+        </div>
+
+        <div class="responses">
+            <h3>Responses</h3>
+            {% if responses %}
+                {% for response in responses %}
+                    <div class="response">
+                        <div class="response-header">
+                            {{ response.responder_name }} - {{ response.created_at }}
+                        </div>
+                        <div class="response-message">{{ response.message }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No responses yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="add-response-form">
+            <h3>Add Response</h3>
+            <textarea id="responseMessage" placeholder="Type your response here..."></textarea>
+            <button id="addResponseBtn">Submit Response</button>
+        </div>
+    </div>
+
+    <script>
+        const ticketId = {{ ticket.id }};
+        const updateStatusBtn = document.getElementById('updateStatusBtn');
+        const statusSelect = document.getElementById('statusSelect');
+        const addResponseBtn = document.getElementById('addResponseBtn');
+        const responseMessage = document.getElementById('responseMessage');
+
+        updateStatusBtn.addEventListener('click', async () => {
+            const newStatus = statusSelect.value;
+            try {
+                const response = await fetch(`/update_ticket_status/${ticketId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (response.ok) {
+                    alert('Status updated successfully.');
+                    location.reload();
+                } else {
+                    alert('Failed to update status.');
+                }
+            } catch (error) {
+                alert('Error updating status.');
+            }
+        });
+
+        addResponseBtn.addEventListener('click', async () => {
+            const message = responseMessage.value.trim();
+            if (!message) {
+                alert('Response message cannot be empty.');
+                return;
+            }
+            try {
+                const response = await fetch(`/add_ticket_response/${ticketId}/responses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+                if (response.ok) {
+                    alert('Response added successfully.');
+                    location.reload();
+                } else {
+                    alert('Failed to add response.');
+                }
+            } catch (error) {
+                alert('Error adding response.');
+            }
+        });
+    </script>
+</body>
+</html>

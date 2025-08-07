@@ -48,6 +48,32 @@ async def create_ticket(
             detail="Failed to create ticket"
         )
 
+@router.get("/get_ticket_responses/{ticket_id}", response_model=List[schemas.TicketResponseResponse])
+async def get_ticket_responses(
+    ticket_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all responses for a specific ticket.
+    """
+    ticket = db.query(models.Ticket).filter(models.Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ticket not found"
+        )
+    
+    # Authorization check
+    if current_user.role == models.UserRole.customer and ticket.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to access this ticket's responses"
+        )
+    
+    responses = db.query(models.TicketResponse).filter(models.TicketResponse.ticket_id == ticket_id).order_by(models.TicketResponse.created_at.asc()).all()
+    return responses
+
 @router.get("/get_tickets", response_model=List[schemas.TicketResponseResponse])
 async def get_tickets(
     current_user: models.User = Depends(get_current_user),

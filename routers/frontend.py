@@ -4,6 +4,8 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
 import models, schemas
+
+from fastapi.responses import Response
 from security import (
     get_password,
     verify_password,
@@ -54,7 +56,7 @@ async def get_current_user_from_cookie(request: Request, db: Session = Depends(g
 @router.get("/login", response_class=HTMLResponse)
 def get_login(request: Request, message: str = None):
     return templates.TemplateResponse(
-        "login.html",
+        "auth/login.html",
         {
             "request": request,
             "error": request.query_params.get("error"),
@@ -65,7 +67,7 @@ def get_login(request: Request, message: str = None):
 @router.get("/register", response_class=HTMLResponse)
 def get_register(request: Request):
     return templates.TemplateResponse(
-        "register.html",
+        "auth/register.html",
         {
             "request": request,
             "error": request.query_params.get("error")
@@ -84,7 +86,7 @@ async def post_register(
     # Validate role
     if role not in ["customer", "support_agent"]:
         return templates.TemplateResponse(
-            "register.html",
+            "auth/register.html",
             {
                 "request": request,
                 "error": "Invalid role selected"
@@ -96,7 +98,7 @@ async def post_register(
     existing_user = db.query(models.User).filter(models.User.email == email).first()
     if existing_user:
         return templates.TemplateResponse(
-            "register.html",
+            "auth/register.html",
             {
                 "request": request,
                 "error": "Email already registered"
@@ -123,7 +125,7 @@ async def post_register(
     except Exception as e:
         db.rollback()
         return templates.TemplateResponse(
-            "register.html",
+            "auth/register.html",
             {
                 "request": request,
                 "error": "Registration failed. Please try again."
@@ -143,7 +145,7 @@ async def post_login(
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user or not verify_password(password, user.password_hash) or user.role.value != role:
         return templates.TemplateResponse(
-            "login.html",
+            "auth/login.html",
             {
                 "request": request,
                 "error": "Invalid credentials or role"
@@ -179,26 +181,33 @@ async def post_login(
     
     return redirect_response
 
+
 @router.get("/dashboard", response_class=HTMLResponse)
 async def get_dashboard(request: Request, current_user: models.User = Depends(get_current_user_from_cookie)):
     if current_user.role == models.UserRole.customer:
-        return templates.TemplateResponse(
-            "customer_dashboard.html",
+        response = templates.TemplateResponse(
+            "customer/customer_dashboard.html",
             {
                 "request": request,
                 "user": current_user  
             }
         )
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
     elif current_user.role == models.UserRole.support_agent:
-        return templates.TemplateResponse(
-            "support_agent_dashboard.html",
+        response = templates.TemplateResponse(
+            "support_agent/support_agent_dashboard.html",
             {
                 "request": request,
                 "user": current_user
             }
         )
-    else:
-        return RedirectResponse(url="/login")
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
 @router.get("/dashboard/my_tickets", response_class=HTMLResponse)
 async def get_my_tickets(request: Request, current_user: models.User = Depends(get_current_user_from_cookie), db: Session = Depends(get_db)):
@@ -206,7 +215,7 @@ async def get_my_tickets(request: Request, current_user: models.User = Depends(g
         return RedirectResponse(url="/login")
     tickets = db.query(models.Ticket).filter(models.Ticket.user_id == current_user.id).order_by(models.Ticket.created_at.desc()).all()
     return templates.TemplateResponse(
-        "customer_my_tickets.html",
+        "customer/customer_my_tickets.html",
         {
             "request": request,
             "user": current_user,
@@ -225,7 +234,7 @@ async def get_knowledge_base(request: Request, current_user: models.User = Depen
         {"id": 3, "title": "Contact support", "summary": "How to contact support team."}
     ]
     return templates.TemplateResponse(
-        "customer_knowledge_base.html",
+        "customer/customer_knowledge_base.html",
         {
             "request": request,
             "user": current_user,
@@ -238,7 +247,7 @@ async def get_settings(request: Request, current_user: models.User = Depends(get
     if current_user.role != models.UserRole.customer:
         return RedirectResponse(url="/login")
     return templates.TemplateResponse(
-        "customer_settings.html",
+        "customer/customer_settings.html",
         {
             "request": request,
             "user": current_user
@@ -266,7 +275,7 @@ async def post_settings(
         db.rollback()
         message = "Failed to update settings."
     return templates.TemplateResponse(
-        "customer_settings.html",
+        "customer/customer_settings.html",
         {
             "request": request,
             "user": current_user,
@@ -283,3 +292,37 @@ async def logout(response: RedirectResponse):
     redirect_response.delete_cookie("access_token")
     redirect_response.delete_cookie("refresh_token")
     return redirect_response
+
+
+@router.get("/dashboard/ticket/{ticket_id}", response_class=HTMLResponse)
+async def get_support_agent_ticket_detail(
+    request: Request,
+    ticket_id: int,
+    current_user: models.User = Depends(get_current_user_from_cookie),
+):
+    if current_user.role != models.UserRole.support_agent:
+        return RedirectResponse(url="/login")
+    
+    async with httpx.AsyncClient() as client:
+        ticket_response = await client.get(f"http://localhost:8000/get_ticket_id/{ticket_id}", headers={"Authorization": f"Bearer {request.cookies.get('access_token').split('Bearer ')[1]}"})
+        if ticket_response.status_code != 200:
+            return RedirectResponse(url="/dashboard")
+        ticket = ticket_response.json()
+        
+        responses_response = await client.get(f"http://localhost:8000/get_ticket_responses/{ticket_id}", headers={"Authorization": f"Bearer {request.cookies.get('access_token').split('Bearer ')[1]}"})
+        if responses_response.status_code != 200:
+            responses = []
+        else:
+            responses = responses_response.json()
+    
+    # Prepare response data with responder names
+    # Assuming responses already contain responder_name, created_at, message
+    return templates.TemplateResponse(
+        "support_agent/support_agent_ticket_detail.html",
+        {
+            "request": request,
+            "user": current_user,
+            "ticket": ticket,
+            "responses": responses
+        }
+    )
